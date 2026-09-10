@@ -1,0 +1,35 @@
+# 不会在动态配置推送中覆盖的固定配置
+# 优先于application.yml加载
+nacos-env: data-element
+
+server:
+  port: 12307
+spring:
+  servlet:
+    multipart:
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+  application:
+    name: mineai-package-manager
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.24.240.1:8848
+        namespace: ${nacos-env}
+      config:
+        server-addr: 172.24.240.1:8848
+        file-extension: yml
+        namespace: ${nacos-env}
+
+        extension-configs[0]:
+          data-id: mysql.yml # MySQL连接配置
+          group: DEFAULT_GROUP
+          refresh: false
+        extension-configs[1]:
+          data-id: jpa.yml # JPA DEBUG配置
+          group: DEFAULT_GROUP
+          refresh: false
+        extension-configs[2]:
+          data-id: mine-package-manager.yml # 打包服务配置
+          group: DEFAULT_GROUP
+          refresh: false

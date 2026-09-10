@@ -1,0 +1,34 @@
+
+
+package org.dubhe.data.domain.vo;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.io.Serializable;
+
+/**
+ * @description 数据集是否为导入
+ * @date 2020-10-13
+ */
+@Data
+@Builder
+public class IsImportVO implements Serializable {
+
+    /**
+     * 导入状态
+     */
+    private Integer status;
+    /**
+     * 导入状态
+     */
+    private Integer dataConversion;
+    /**
+     * 真正的进度
+     */
+    private Integer progress;
+    /**
+     * 剩余时间
+     */
+    private Integer remainTime;
+}

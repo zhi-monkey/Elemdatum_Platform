@@ -1,0 +1,18 @@
+spring:
+  cloud:
+    inetutils:
+      preferred-networks: 10.240.0
+center:
+  server:
+    address: 127.0.0.1:80
+k8s:
+  cluster:
+    address: 10.8.176.84:31407
+    user: admin
+    password: Aa123456789.
+
+dubhe:
+  cluster:
+    address: localhost
+    user: admin
+    password: 123456

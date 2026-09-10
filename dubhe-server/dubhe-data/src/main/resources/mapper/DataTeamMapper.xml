@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.dubhe.data.dao.DataTeamMapper">
+
+    <select id="getSubtaskStatusListByTaskId" resultType="java.lang.Integer">
+        SELECT distinct status from data_team_subtask WHERE id IN (SELECT subtask_id FROM `data_team_task_subtask` WHERE task_id = #{taskId}) AND deleted=0;
+    </select>
+
+    <select id="getSubtaskListByTaskId" resultType="org.dubhe.data.domain.entity.DataTeamSubtask">
+        SELECT * from data_team_subtask WHERE id IN (SELECT subtask_id FROM `data_team_task_subtask` WHERE task_id = #{taskId}) AND deleted=0;
+    </select>
+</mapper>

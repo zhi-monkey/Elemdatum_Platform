@@ -1,0 +1,65 @@
+package org.dubhe.biz.base.constant;
+
+/**
+ * @description 授权常量类
+ * @date 2020-11-05
+ */
+public class AuthConst {
+    /**
+     * 授权token名称 Header
+     */
+    public final static String AUTHORIZATION = "Authorization";
+    /**
+     * 授权token名称 Params
+     */
+    public final static String ACCESS_TOKEN = "access_token";
+    /**
+     * token前缀
+     */
+    public final static String ACCESS_TOKEN_PREFIX = "Bearer ";
+    /**
+     * 客户端安全码
+     * $2a$10$RUYBRsyV2jpG7pvg/VNus.YHVebzfRen3RGeDe1LVEIJeHYe2F1YK
+     */
+    public final static String CLIENT_SECRET = "dubhe-secret";
+    /**
+     * 客户端安全码
+     */
+    public final static String CLIENT_ID = "dubhe-client";
+    /**
+     * 授权中心token校验地址
+     */
+    public final static String CHECK_TOKEN_ENDPOINT_URL = "http://" + ApplicationNameConst.SERVER_AUTHORIZATION + "/oauth/check_token";
+    /**
+     * 默认匿名访问路径
+     */
+    public final static String[] DEFAULT_PERMIT_PATHS = {
+            "/internal/multi/record-imports/claim",
+            "/internal/multi/record-imports/*/progress",
+            "/internal/multi/record-imports/*/assets",
+            "/internal/multi/record-imports/*/complete",
+            "/internal/multi/record-imports/*/fail",
+            "/swagger**/**", "/webjars/**", "/v2/api-docs/**", "/doc.html/**",
+            "/users/findUserByUsername", "/auth/login", "/auth/code", "/auth/register",
+            "/datasets/files/annotations/auto", "/datasets/versions/**/convert/finish", "/datasets/enhance/finish",
+            "/auth/getCodeBySentEmail", "/auth/userRegister", "/ws/**", "/oauth/health", "/datasets/zlm/record","/params/**",
+            "/notifications/**", "/api/v1/data/notifications/**",
+            StringConstant.RECYCLE_CALL_URI + "**"
+    };
+    /**
+     * k8s 回调token key
+     */
+    public static final String K8S_CALLBACK_TOKEN = "k8sCallbackToken";
+    /**
+     * 通用授权token key
+     */
+    public static final String COMMON_TOKEN = "commonToken";
+    /**
+     * 授权模式
+     */
+    public static final String GRANT_TYPE = "password";
+
+    private AuthConst() {
+
+    }
+}

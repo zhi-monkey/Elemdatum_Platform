@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: videosample
+  namespace: mineai-cz
+spec:
+  selector:
+    matchLabels:
+      app: videosample
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: videosample
+    spec:
+      terminationGracePeriodSeconds: 1200
+      containers:
+        - name: videosample
+          image: dockerhub.kubekey.local/enlin/videosample:v1
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command: ["test","-e","/root/.startup"]
+          command: ["/bin/bash","-c","cd /dubhe_data_process && python3 main.py videosample False mineai-redis-master.mineai-cz,6379,10,'DUBHE_REDIS_PASSWORD'"]
+          volumeMounts:
+            - name: code-pvc
+              mountPath: /dubhe_data_process
+              subPath: dubhe_data_process
+            - name: code-pvc
+              mountPath: /nfs
+          ports:
+            - containerPort: 9898
+              protocol: TCP
+      volumes:
+        - name: code-pvc
+          persistentVolumeClaim:
+            claimName: cz-dubhe-data-pvc

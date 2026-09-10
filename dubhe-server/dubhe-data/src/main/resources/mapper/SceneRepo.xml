@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.dubhe.data.dao.DataTeamUserMapper">
+
+    <delete id="deleteByDataTeamId" parameterType="long">
+        delete from data_team_user where data_team_id in
+        <foreach item="item" collection="list" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <insert id="insertBatchs">
+        insert into data_team_user (data_team_id,user_id)values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.dataTeamId}, #{userId})
+        </foreach>
+    </insert>
+
+</mapper>

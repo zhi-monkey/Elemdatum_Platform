@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: $K8S_NS_AI
+  name: file-deployment
+  labels:
+    app: file
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file
+  template:
+    metadata:
+      labels:
+        app: file
+    spec:
+      containers:
+        - name: file
+          image: dockerhub.kubekey.local/filebrowser/filebrowser
+          command:
+            - sh
+            - -c
+            - "/filebrowser config init && /filebrowser config import /config/.filebrowser.json && /filebrowser users add admin admin && /filebrowser"
+          ports:
+            - containerPort: 80
+              name: http-file
+          volumeMounts:
+            - name: volume-file
+              readOnly: true
+              mountPath: /config
+            - name: file-data
+              mountPath: /srv
+          env:
+            - name: FB_BASEURL
+              value: /file/
+            - name: FB_NOAUTH
+              value: "true"
+      volumes:
+        - name: volume-file
+          configMap:
+            name: file
+#        - name: file-data
+#          hostPath:
+#            path: /home/data
+#            type: DirectoryOrCreate
+        - name: file-data
+          persistentVolumeClaim:
+            claimName: file-data
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mine-ai-file
+  namespace: $K8S_NS_AI
+spec:
+  type: NodePort
+  selector:
+    app: file
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http-file
+      nodePort: 30013

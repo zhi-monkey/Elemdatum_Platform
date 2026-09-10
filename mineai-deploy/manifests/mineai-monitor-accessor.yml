@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: $K8S_NS_AI
+  name: monitor-accessor-deployment
+  labels:
+    app: monitor-accessor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monitor-accessor
+  template:
+    metadata:
+      labels:
+        app: monitor-accessor
+    spec:
+      containers:
+        - name: monitor-accessor
+          image: $REGISTRY_URL/$PUB_REGISTRY_REPO/mineai-monitor-accessor:$TAG
+          volumeMounts:
+            - name: file-data
+              mountPath: /home/dataset
+          env:
+            - name: PARAMS
+              value: --nacos-env=$NACOS_NS_ID --spring.cloud.nacos.discovery.server-addr=$NACOS_ADDR --spring.cloud.nacos.config.server-addr=$NACOS_ADDR
+      volumes:
+#        - name: file-data
+#          hostPath:
+#            path: /home/data
+#            type: DirectoryOrCreate
+        - name: file-data
+          persistentVolumeClaim:
+            claimName: file-data

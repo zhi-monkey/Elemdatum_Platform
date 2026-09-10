@@ -1,0 +1,8 @@
+mineai-model-manager.yml
+mineai-ui.yml
+mineai-controller-manager.yml
+mineai-monitor-accessor.yml
+mineai-worker-manager.yml
+mineai-data-manager.yml
+mineai-system.yml
+mineai-gateway.yml

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.dlut.adv.mineai.model.dao.ModelVersionMapper">
+    <select id="getByShowName" resultType="org.dlut.adv.mineai.core.entity.ModelVersion">
+        SELECT * FROM model_version WHERE show_name = #{showName}
+    </select>
+    
+    <select id="getModelVersionByShowNameAndLevel" resultType="org.dlut.adv.mineai.core.entity.ModelVersion">
+        SELECT * FROM model_version
+        WHERE show_name = #{showName}
+          AND level = #{level}
+    </select>
+
+    <select id="getModelVersionByName" resultType="org.dlut.adv.mineai.core.entity.ModelVersion">
+        SELECT * FROM model_version WHERE name = #{name} AND isDelete = #{NOT_DELETE}
+    </select>
+
+
+</mapper>

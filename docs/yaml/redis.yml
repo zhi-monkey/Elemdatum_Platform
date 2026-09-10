@@ -1,0 +1,30 @@
+# spring:
+#   redis:
+#     # Redis库索引（默认为0）dev为5，test为4，prod为3
+#     database: 5
+#     # Redis服务器地址
+#     host: 192.168.31.182
+#     # Redis服务端口
+#     port: 30002
+#     # Redis连接密码（默认为空）
+#     password:
+#     lettuce:
+#       pool:
+#         # 连接池最大连接数（默认为8）
+#         max-active: 8
+#         # 连接池最大空闲连接（默认为8）
+#         max-idle: 8
+#         # 连接池最小空闲连接（默认为0）
+#         min-idle: 0
+#         # 连接池最大阻塞等待时间
+#         max-wait: -1ms
+
+spring:
+  redis:
+  # 数据库索引(本地设置8)
+    database: 8
+    host: 210.30.96.107
+    port: 30379
+    password: DUBHE_REDIS_PASSWORD
+    # 连接超时时间
+    timeout: 5000

@@ -1,0 +1,390 @@
+version: 39
+properties:
+- name: KUBECONFIG_CREDENTIAL_ID
+  value: admin-deploy
+  archived: false
+- name: REGISTRY
+  value: registry.cn-hangzhou.aliyuncs.com
+  archived: false
+- name: DOCKERHUB_NAMESPACE
+  value: mineai
+  archived: false
+- name: NACOS_ENV
+  value: STAGAI_ID
+  archived: false
+- name: K8S_NAMESPACE
+  value: mine-ai
+  archived: false
+- name: DOCKER_USERNAME
+  value: '13206532286'
+  archived: false
+jobs:
+- name: 测试
+  jobExecutor: host-docker-root
+  steps:
+  - !CheckoutStep
+    name: 检查代码
+    cloneCredential: !DefaultCredential {}
+    withLfs: false
+    withSubmodules: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: 执行yarn build
+    runInContainer: true
+    image: node
+    interpreter: !DefaultInterpreter
+      commands: |
+        cd mineai-ui
+        npm list -g --depth=0 yarn || npm install -g yarn
+        npm list -g --depth=0 cross-env || npm install -g cross-env
+        yarn install
+        yarn build
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: 执行maven test
+    runInContainer: true
+    image: maven
+    interpreter: !DefaultInterpreter
+      commands: |
+        ls
+        mvn test
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !RunContainerStep
+    name: JS检查
+    image: pipelinecomponents/eslint
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  triggers:
+  - !PullRequestUpdateTrigger {}
+  - !PullRequestMergeTrigger {}
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: AI平台流水线
+  jobExecutor: host-docker-root
+  steps:
+  - !CheckoutStep
+    name: 检查代码
+    cloneCredential: !DefaultCredential {}
+    withLfs: false
+    withSubmodules: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: 单元测试
+    runInContainer: true
+    image: kubesphere/builder-maven:v3.2.0
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "@build_number@" > build_number.txt
+        echo "开始单元测试..."
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: Maven打包
+    runInContainer: true
+    image: kubesphere/builder-maven:v3.2.0
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "开始Maven打包..."
+        mvn clean package -DskipTests -B
+        echo "打包完成，查看模块的JAR："
+        find . -name "*.jar" -type f
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: dubhe maven打包
+    runInContainer: true
+    image: kubesphere/builder-maven:v3.2.0
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "进入dubhe-server目录..."
+        cd dubhe-server
+        echo "开始Maven打包..."
+        mvn -Dmaven.test.skip=true clean package
+        echo "打包完成，回到根目录"
+        cd ../
+        echo "查看生成的JAR："
+        find dubhe-server/ -name "*.jar" -type f
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !CommandStep
+    name: Vite前端构建
+    runInContainer: true
+    image: node:16-alpine
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "设置 npm/yarn 镜像源..."
+        npm config set registry https://registry.npmmirror.com/
+        yarn config set registry https://registry.npmmirror.com/
+        yarn config set cache-folder /root/.yarn
+
+        echo "进入前端项目目录..."
+        cd mineai-ui
+
+        echo "配置 npm 镜像..."
+        npm config set registry https://registry.npmmirror.com
+        npm config set disturl https://registry.npmmirror.com/dist
+
+        echo "安装依赖..."
+        yarn install --registry=https://registry.npmmirror.com --frozen-lockfile
+
+        echo "开始构建..."
+        yarn run build
+
+        echo "构建完成，返回根目录"
+        cd ../
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  - !PublishArtifactStep
+    name: 发布构建产物
+    sourcePath: .
+    artifacts: '**'
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+  postBuildActions:
+  - !RunJobAction
+    condition: successful
+    jobName: 构建网关镜像
+  - !RunJobAction
+    condition: successful
+    jobName: 构建模型管理镜像
+  - !RunJobAction
+    condition: successful
+    jobName: 构建包管理服务镜像
+  - !RunJobAction
+    condition: successful
+    jobName: 构建 Dubhe 认证服务镜像
+  - !RunJobAction
+    condition: successful
+    jobName: 构建 Dubhe 管理服务镜像
+  - !RunJobAction
+    condition: successful
+    jobName: 构建 Dubhe 数据服务镜像
+  - !RunJobAction
+    condition: successful
+    jobName: 构建 Dubhe 数据任务服务镜像
+  - !RunJobAction
+    condition: successful
+    jobName: 构建前端 UI 镜像
+- name: 构建网关镜像
+  jobExecutor: host-docker-root
+  steps:
+  - !CommandStep
+    name: 构建网关镜像
+    runInContainer: true
+    image: docker:20.10-dind
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "@secrets:DOCKER_PASSWORD@" | docker login @properties:REGISTRY@ -u "@properties:DOCKER_USERNAME@" --password-stdin
+        BUILD_NUMBER=$(cat build_number.txt)
+        APP_NAME=mineai-gateway
+        docker build -t ${APP_NAME}:latest -f ${APP_NAME}/Dockerfile ./${APP_NAME}/
+        docker tag ${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker tag ${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:latest
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:latest
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  jobDependencies:
+  - jobName: AI平台流水线
+    requireSuccessful: true
+    artifacts: '**'
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: 构建模型管理镜像
+  jobExecutor: host-docker-root
+  steps:
+  - !CommandStep
+    name: 构建模型管理镜像
+    runInContainer: true
+    image: docker:20.10-dind
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "@secrets:DOCKER_PASSWORD@" | docker login @properties:REGISTRY@ -u "@properties:DOCKER_USERNAME@" --password-stdin
+        BUILD_NUMBER=$(cat build_number.txt)
+        APP_NAME=mineai-model-manager
+        docker build -t ${APP_NAME}:latest -f ${APP_NAME}/Dockerfile ./${APP_NAME}/
+        docker tag ${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker tag ${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:latest
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:latest
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  jobDependencies:
+  - jobName: AI平台流水线
+    requireSuccessful: true
+    artifacts: '**'
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: 构建包管理服务镜像
+  jobExecutor: host-docker-root
+  steps:
+  - !CommandStep
+    name: 构建包管理服务镜像
+    runInContainer: true
+    image: docker:20.10-dind
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "@secrets:DOCKER_PASSWORD@" | docker login @properties:REGISTRY@ -u "@properties:DOCKER_USERNAME@" --password-stdin
+        BUILD_NUMBER=$(cat build_number.txt)
+        APP_NAME=mineai-package-manager
+        docker build -t ${APP_NAME}:latest -f ${APP_NAME}/Dockerfile ./${APP_NAME}/
+        docker tag ${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker tag ${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:latest
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:latest
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  jobDependencies:
+  - jobName: AI平台流水线
+    requireSuccessful: true
+    artifacts: '**'
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: 构建 Dubhe 认证服务镜像
+  jobExecutor: host-docker-root
+  steps:
+  - !CommandStep
+    name: 构建 Dubhe 认证服务镜像
+    runInContainer: true
+    image: docker:20.10-dind
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "@secrets:DOCKER_PASSWORD@" | docker login @properties:REGISTRY@ -u "@properties:DOCKER_USERNAME@" --password-stdin
+        BUILD_NUMBER=$(cat build_number.txt)
+        APP_NAME=dubhe-auth
+        docker build -t mineai-${APP_NAME}:latest -f dubhe-server/${APP_NAME}/Dockerfile ./dubhe-server/${APP_NAME}/
+        docker tag mineai-${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker tag mineai-${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:latest
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:latest
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  jobDependencies:
+  - jobName: AI平台流水线
+    requireSuccessful: true
+    artifacts: '**'
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: 构建 Dubhe 管理服务镜像
+  jobExecutor: host-docker-root
+  steps:
+  - !CommandStep
+    name: 构建 Dubhe 管理服务镜像
+    runInContainer: true
+    image: docker:20.10-dind
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "@secrets:DOCKER_PASSWORD@" | docker login @properties:REGISTRY@ -u "@properties:DOCKER_USERNAME@" --password-stdin
+        BUILD_NUMBER=$(cat build_number.txt)
+        APP_NAME=dubhe-admin
+        docker build -t mineai-${APP_NAME}:latest -f dubhe-server/${APP_NAME}/Dockerfile ./dubhe-server/${APP_NAME}/
+        docker tag mineai-${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker tag mineai-${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:latest
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:latest
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  jobDependencies:
+  - jobName: AI平台流水线
+    requireSuccessful: true
+    artifacts: '**'
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: 构建 Dubhe 数据服务镜像
+  jobExecutor: host-docker-root
+  steps:
+  - !CommandStep
+    name: 构建 Dubhe 数据服务镜像
+    runInContainer: true
+    image: docker:20.10-dind
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "@secrets:DOCKER_PASSWORD@" | docker login @properties:REGISTRY@ -u "@properties:DOCKER_USERNAME@" --password-stdin
+        BUILD_NUMBER=$(cat build_number.txt)
+        APP_NAME=dubhe-data
+        docker build -t mineai-${APP_NAME}:latest -f dubhe-server/${APP_NAME}/Dockerfile ./dubhe-server/${APP_NAME}/
+        docker tag mineai-${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker tag mineai-${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:latest
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:latest
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  jobDependencies:
+  - jobName: AI平台流水线
+    requireSuccessful: true
+    artifacts: '**'
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: 构建 Dubhe 数据任务服务镜像
+  jobExecutor: host-docker-root
+  steps:
+  - !CommandStep
+    name: 构建 Dubhe 数据任务服务镜像
+    runInContainer: true
+    image: docker:20.10-dind
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "@secrets:DOCKER_PASSWORD@" | docker login @properties:REGISTRY@ -u "@properties:DOCKER_USERNAME@" --password-stdin
+        BUILD_NUMBER=$(cat build_number.txt)
+        APP_NAME=dubhe-data-task
+        docker build -t mineai-${APP_NAME}:latest -f dubhe-server/${APP_NAME}/Dockerfile ./dubhe-server/${APP_NAME}/
+        docker tag mineai-${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker tag mineai-${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:latest
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/mineai-${APP_NAME}:latest
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  jobDependencies:
+  - jobName: AI平台流水线
+    requireSuccessful: true
+    artifacts: '**'
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
+- name: 构建前端 UI 镜像
+  jobExecutor: host-docker-root
+  steps:
+  - !CommandStep
+    name: 构建前端 UI 镜像
+    runInContainer: true
+    image: docker:20.10-dind
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "@secrets:DOCKER_PASSWORD@" | docker login @properties:REGISTRY@ -u "@properties:DOCKER_USERNAME@" --password-stdin
+        BUILD_NUMBER=$(cat build_number.txt)
+        APP_NAME=mineai-ui
+        docker build -t ${APP_NAME}:latest -f ${APP_NAME}/Dockerfile ./${APP_NAME}/
+        docker tag ${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:SNAPSHOT-new-${BUILD_NUMBER}
+        docker tag ${APP_NAME}:latest @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:latest
+        docker push @properties:REGISTRY@/@properties:DOCKERHUB_NAMESPACE@/${APP_NAME}:latest
+    useTTY: false
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  jobDependencies:
+  - jobName: AI平台流水线
+    requireSuccessful: true
+    artifacts: '**'
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600

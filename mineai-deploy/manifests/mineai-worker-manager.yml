@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: $K8S_NS_AI
+  name: worker-manager-deployment
+  labels:
+    app: worker-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker-manager
+  template:
+    metadata:
+      labels:
+        app: worker-manager
+    spec:
+      containers:
+        - name: worker-manager
+          image: $REGISTRY_URL/$PUB_REGISTRY_REPO/mineai-worker-manager:$TAG
+          env:
+            - name: PARAMS
+              value: --nacos-env=$NACOS_NS_ID --spring.cloud.nacos.discovery.server-addr=$NACOS_ADDR --spring.cloud.nacos.config.server-addr=$NACOS_ADDR

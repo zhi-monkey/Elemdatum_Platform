@@ -1,0 +1,375 @@
+<template>
+  <!-- 服务器信息和资源占用情况在同一个 Card 中，随着 tabs 切换 -->
+  <Card :tabList="tabList" :activeTabKey="activeKey" @tabChange="activeKey = $event">
+    <a-row :gutter="24" class="info-layout">
+      <a-col :span="8">
+        <div class="info-section">
+          <a-row class="statistic-row1">
+            <a-col :span="12" align="center">
+              <Statistic title="Name" :value="serverData[activeKey].serverDetail.type" />
+            </a-col>
+            <a-col :span="12" align="center">
+              <Statistic title="IP" :value="serverData[activeKey].serverDetail.ip" />
+            </a-col>
+          </a-row>
+          <a-row class="statistic-row2" :gutter="16">
+            <a-col :span="12" align="center">
+              <Statistic title="Location" :value="serverData[activeKey].serverDetail.location" />
+            </a-col>
+            <a-col :span="12" align="center">
+              <Statistic
+                title="Status"
+                :value="serverData[activeKey].serverDetail.status"
+                :valueStyle="{
+                  color:
+                    serverData[activeKey].serverDetail.status === '在线' ? '#47fa2d' : '#be1a1a',
+                }"
+              />
+            </a-col>
+          </a-row>
+        </div>
+      </a-col>
+      <a-col :span="16">
+        <div class="status-section">
+          <div class="resource-usage">
+            <p
+              ><strong>CPU Usage: {{ (totalCpuUsed / totalCpu) * 100 }} %</strong></p
+            >
+            <Progress
+              :percent="Number(((totalCpuUsed / totalCpu) * 100).toFixed(2))"
+              strokeColor="#ff6347"
+              status="active"
+            />
+            <p><strong>Memory Usage:</strong></p>
+            <p>总使用量: {{ totalMemoryUsed }} GB / 总量: {{ totalMemory }} GB</p>
+            <Progress
+              :percent="Number(((totalMemoryUsed / totalMemory) * 100).toFixed(2))"
+              strokeColor="#00bfff"
+              status="active"
+            />
+          </div>
+        </div>
+      </a-col>
+    </a-row>
+  </Card>
+
+  <Divider />
+
+  <!-- 图表展示区域，不随 tabs 切换 -->
+  <Card bordered>
+    <a-row :gutter="[16, 16]" class="chart-area">
+      <a-col :span="8" class="chart-container">
+        <div class="chart" ref="cpuChart"></div>
+      </a-col>
+      <a-col :span="4">
+        <div class="chart-info">
+          <h3>CPU 资源分配情况</h3>
+          <p>总使用量: {{ totalCpuUsed }}个/总量: {{ totalCpu }}个</p>
+        </div>
+        <ul>
+          <li
+            v-for="dept in serverData[activeKey].charData.departmentResourceDetail"
+            :key="dept.departmentName"
+          >
+            {{ dept.departmentName }} ({{ dept.cpuUsed }}/{{ dept.totalCpu }})
+          </li>
+        </ul>
+      </a-col>
+
+      <a-col :span="8" class="chart-container">
+        <div class="chart" ref="memoryChart"></div>
+      </a-col>
+      <a-col :span="4">
+        <div class="chart-info">
+          <h3>内存资源使用情况</h3>
+          <p>总使用量: {{ totalMemoryUsed }}GB / 总量: {{ totalMemory }}GB</p>
+        </div>
+        <ul>
+          <li
+            v-for="dept in serverData[activeKey].charData.departmentResourceDetail"
+            :key="dept.departmentName"
+          >
+            {{ dept.departmentName }} ({{ dept.memoryUsed }}/{{ dept.totalMemory }})
+          </li>
+        </ul>
+      </a-col>
+    </a-row>
+  </Card>
+</template>
+
+<script setup lang="ts">
+  import { ref, computed, onMounted, nextTick } from 'vue';
+  import { Card, Statistic, Progress, Divider, Row as aRow, Col as aCol } from 'ant-design-vue';
+  import * as echarts from 'echarts';
+
+  const serverData = {
+    '1': {
+      serverDetail: {
+        ip: '192.168.1.1',
+        name: 'm1',
+        location: '北京',
+        status: '在线',
+        type: 'm1',
+        createTime: '2023-01-01',
+        updateTime: '2023-01-01',
+        remark: '备注信息',
+      },
+      charData: {
+        cpuUsed: 17,
+        totalCpu: 25,
+        memoryUsed: 135,
+        totalMemory: 512,
+        departmentResourceDetail: [
+          { departmentName: '部门1', cpuUsed: 2, totalCpu: 5, memoryUsed: 75, totalMemory: 100 },
+          { departmentName: '部门2', cpuUsed: 3, totalCpu: 5, memoryUsed: 89, totalMemory: 100 },
+          { departmentName: '部门3', cpuUsed: 4, totalCpu: 5, memoryUsed: 22, totalMemory: 100 },
+          { departmentName: '部门4', cpuUsed: 4, totalCpu: 5, memoryUsed: 11, totalMemory: 100 },
+          { departmentName: '部门5', cpuUsed: 3, totalCpu: 5, memoryUsed: 89, totalMemory: 100 },
+        ],
+      },
+    },
+    '2': {
+      serverDetail: {
+        ip: '192.168.1.2',
+        name: 'm2',
+        location: '上海',
+        status: '掉线',
+        type: 'm2',
+        createTime: '2023-01-01',
+        updateTime: '2023-01-01',
+        remark: '备注信息',
+      },
+      charData: {
+        cpuUsed: 15,
+        totalCpu: 30,
+        memoryUsed: 210,
+        totalMemory: 512,
+        departmentResourceDetail: [
+          { departmentName: '部门A', cpuUsed: 6, totalCpu: 10, memoryUsed: 100, totalMemory: 150 },
+          { departmentName: '部门B', cpuUsed: 5, totalCpu: 10, memoryUsed: 60, totalMemory: 150 },
+          { departmentName: '部门C', cpuUsed: 4, totalCpu: 10, memoryUsed: 50, totalMemory: 150 },
+        ],
+      },
+    },
+    '3': {
+      serverDetail: {
+        ip: '192.168.1.3',
+        name: 'm3',
+        location: '广州',
+        status: '在线',
+        type: 'm3',
+        createTime: '2023-01-01',
+        updateTime: '2023-01-01',
+        remark: '备注信息',
+      },
+      charData: {
+        cpuUsed: 8,
+        totalCpu: 20,
+        memoryUsed: 160,
+        totalMemory: 256,
+        departmentResourceDetail: [
+          { departmentName: '部门X', cpuUsed: 2, totalCpu: 5, memoryUsed: 50, totalMemory: 64 },
+          { departmentName: '部门Y', cpuUsed: 3, totalCpu: 5, memoryUsed: 60, totalMemory: 64 },
+          { departmentName: '部门Z', cpuUsed: 3, totalCpu: 5, memoryUsed: 50, totalMemory: 64 },
+        ],
+      },
+    },
+  };
+
+  const activeKey = ref('1');
+
+  const tabList = [
+    { key: '1', tab: 'm1' },
+    { key: '2', tab: 'm2' },
+    { key: '3', tab: 'm3' },
+  ];
+
+  const totalCpuUsed = computed(() => serverData[activeKey.value].charData.cpuUsed);
+  const totalCpu = computed(() => serverData[activeKey.value].charData.totalCpu);
+  const totalMemoryUsed = computed(() => serverData[activeKey.value].charData.memoryUsed);
+  const totalMemory = computed(() => serverData[activeKey.value].charData.totalMemory);
+
+  const cpuChart = ref(null);
+  const memoryChart = ref(null);
+
+  onMounted(async () => {
+    await nextTick();
+
+    if (cpuChart.value) {
+      const cpuChartInstance = echarts.init(cpuChart.value);
+      const cpuData = serverData[activeKey.value].charData.departmentResourceDetail.map((dept) => ({
+        value: dept.cpuUsed,
+        name: `${dept.departmentName} (${dept.cpuUsed}/${dept.totalCpu})`,
+      }));
+      cpuData.push({
+        value: totalCpu.value - totalCpuUsed.value,
+        name: '未使用',
+      });
+      cpuChartInstance.setOption({
+        backgroundColor: 'rgba(36, 46, 73, 0)',
+        title: {
+          text: 'CPU 使用情况',
+          left: 'center',
+          textStyle: {
+            color: '#ffffff',
+          },
+        },
+        tooltip: {
+          trigger: 'item',
+          textStyle: {
+            color: '#0d114f',
+          },
+        },
+        legend: {
+          top: 'bottom',
+          textStyle: {
+            color: '#ffffff',
+          },
+        },
+        series: [
+          {
+            name: 'CPU',
+            type: 'pie',
+            radius: '50%',
+            data: cpuData,
+            label: {
+              color: '#ffffff',
+              fontSize: 11,
+              formatter: '{b}',
+            },
+            labelLine: {
+              lineStyle: {
+                color: '#ffffff',
+              },
+            },
+            itemStyle: {
+              color: (params) => {
+                const colors = [
+                  '#4c568a',
+                  '#26a69a',
+                  '#ff6f61',
+                  '#f6d365',
+                  '#8854d0',
+                  '#52796f',
+                  '#f7b801',
+                ];
+                return colors[params.dataIndex % colors.length];
+              },
+            },
+          },
+        ],
+        grid: {
+          left: '10%',
+          right: '10%',
+          bottom: '10%',
+          containLabel: true,
+        },
+      });
+    }
+
+    if (memoryChart.value) {
+      const memoryChartInstance = echarts.init(memoryChart.value);
+      const memoryData = serverData[activeKey.value].charData.departmentResourceDetail.map(
+        (dept) => ({
+          value: dept.memoryUsed,
+          name: `${dept.departmentName} (${dept.memoryUsed}/${dept.totalMemory})`,
+        }),
+      );
+      memoryData.push({
+        value: totalMemory.value - totalMemoryUsed.value,
+        name: '未使用',
+      });
+      memoryChartInstance.setOption({
+        backgroundColor: 'rgba(36, 46, 73, 0)',
+        title: {
+          text: '内存使用情况',
+          left: 'center',
+          textStyle: {
+            color: '#ffffff',
+          },
+        },
+        tooltip: {
+          trigger: 'item',
+          textStyle: {
+            color: '#06083f',
+          },
+        },
+        legend: {
+          top: 'bottom',
+          textStyle: {
+            color: '#ffffff',
+          },
+        },
+        series: [
+          {
+            name: '内存',
+            type: 'pie',
+            radius: '50%',
+            data: memoryData,
+            label: {
+              color: '#ffffff',
+              fontSize: 12,
+              formatter: '{b}',
+            },
+            labelLine: {
+              lineStyle: {
+                color: '#ffffff',
+              },
+            },
+            itemStyle: {
+              color: (params) => {
+                const colors = [
+                  '#5e4fa2',
+                  '#3182bd',
+                  '#6baed6',
+                  '#fd8d3c',
+                  '#fdae6b',
+                  '#e78ac3',
+                  '#a6cee3',
+                ];
+                return colors[params.dataIndex % colors.length];
+              },
+            },
+          },
+        ],
+        grid: {
+          left: '10%',
+          right: '10%',
+          bottom: '10%',
+          containLabel: true,
+        },
+      });
+    }
+  });
+</script>
+
+<style scoped>
+  .info-layout {
+    margin-top: 16px;
+  }
+  .info-section {
+    margin-top: 14px;
+  }
+
+  .chart-area {
+    margin-top: 16px;
+  }
+
+  .chart-container {
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .chart {
+    width: 100%;
+    height: 300px;
+  }
+
+  .chart-info {
+    margin-top: 16px;
+  }
+
+  .statistic-row2 {
+    margin-top: 20px;
+  }
+</style>

@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: $K8S_NS_AI
+  name: ui-deployment
+  labels:
+    app: ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ui
+  template:
+    metadata:
+      labels:
+        app: ui
+    spec:
+      containers:
+        - name: ui
+          image: $REGISTRY_URL/$PUB_REGISTRY_REPO/mineai-ui:$TAG
+          ports:
+            - containerPort: 80
+              name: http-ui
+          volumeMounts:
+            - name: volume-ui
+              readOnly: true
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: file-data
+              readOnly: true
+              mountPath: /usr/share/nginx/html/raw
+
+      volumes:
+        - name: volume-ui
+          configMap:
+            name: ui
+        - name: file-data
+          persistentVolumeClaim:
+            claimName: file-data
+
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: $K8S_NS_AI
+  name: mine-ai-ui
+spec:
+  selector:
+    app: ui
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http-ui

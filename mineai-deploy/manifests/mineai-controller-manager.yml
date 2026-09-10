@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: $K8S_NS_AI
+  name: controller-manager-deployment
+  labels:
+    app: controller-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: controller-manager
+  template:
+    metadata:
+      labels:
+        app: controller-manager
+    spec:
+      containers:
+        - name: controller-manager
+          image: $REGISTRY_URL/$PUB_REGISTRY_REPO/mineai-controller-manager:$TAG
+          env:
+            - name: PARAMS
+              value:  --nacos-env=$NACOS_NS_ID --spring.cloud.nacos.discovery.server-addr=$NACOS_ADDR --spring.cloud.nacos.config.server-addr=$NACOS_ADDR

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: $K8S_NS_AI
+  name: data-manager-deployment
+  labels:
+    app: data-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-manager
+  template:
+    metadata:
+      labels:
+        app: data-manager
+    spec:
+      containers:
+        - name: data-manager
+          image: $REGISTRY_URL/$PUB_REGISTRY_REPO/mineai-data-manager:$TAG
+          volumeMounts:
+            - name: file-data
+              mountPath: /home/dataset
+          env:
+            - name: PARAMS
+              value: --nacos-env=$NACOS_NS_ID --spring.cloud.nacos.discovery.server-addr=$NACOS_ADDR --spring.cloud.nacos.config.server-addr=$NACOS_ADDR
+      volumes:
+#        - name: file-data
+#          hostPath:
+#            path: /home/data
+#            type: DirectoryOrCreate
+        - name: file-data
+          persistentVolumeClaim:
+            claimName: file-data

@@ -1,0 +1,492 @@
+.group-title-link {
+  display: flex;
+  align-items: center;
+  font-size: 14px !important;
+  font-weight: 500;
+  color: #1890ff;
+
+  &:hover {
+    color: #40a9ff;
+    text-decoration: underline;
+  }
+
+  .anticon {
+    margin-right: 6px;
+  }
+}
+
+.dataset-group-card-horizontal {
+  height: 280px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(24, 144, 255, 0.15);
+  border-radius: 8px;
+  background: transparent !important;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(24, 144, 255, 0.25);
+    transform: translateY(-2px);
+    border-color: rgba(24, 144, 255, 0.5);
+  }
+
+  :deep(.ant-card-head) {
+    background: transparent;
+    border-bottom: 1px solid rgba(24, 144, 255, 0.15);
+    padding: 0 20px;
+    min-height: 60px;
+  }
+
+  :deep(.ant-card-head-title) {
+    padding: 12px 0;
+  }
+
+  :deep(.ant-card-body) {
+    background: transparent;
+    padding: 20px;
+    height: calc(280px - 60px);
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    .card-title-section {
+      display: flex;
+      align-items: center;
+      flex: 1;
+
+      .title-icon {
+        font-size: 18px;
+        color: #1890ff;
+        margin-right: 8px;
+      }
+
+      .group-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: inherit;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .card-actions {
+      .action-link {
+        color: #1890ff;
+        font-size: 14px;
+        transition: color 0.3s;
+
+        &:hover {
+          color: #40a9ff;
+        }
+      }
+    }
+  }
+
+  .card-content-horizontal {
+    display: flex;
+    height: 100%;
+    gap: 24px;
+
+    .stats-section {
+      flex: 0 0 60%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      .stats-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+
+        .stat-item {
+          text-align: center;
+          padding: 16px 12px;
+          border-radius: 8px;
+          border: 1px solid rgba(24, 144, 255, 0.2);
+          transition: all 0.3s ease;
+          background: transparent;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
+            border-color: rgba(24, 144, 255, 0.4);
+          }
+
+          :deep(.ant-statistic-title) {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.65);
+            font-weight: 500;
+            margin-bottom: 4px;
+          }
+
+          :deep(.ant-statistic-content) {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+
+          // 主蓝色调，不同透明度区分
+          &:nth-child(1) {
+            border-color: rgba(24, 144, 255, 0.3);
+            :deep(.ant-statistic-content-value) {
+              color: #1890ff !important;
+            }
+          }
+
+          &:nth-child(2) {
+            border-color: rgba(64, 169, 255, 0.3);
+            :deep(.ant-statistic-content-value) {
+              color: #40a9ff !important;
+            }
+          }
+
+          &:nth-child(3) {
+            border-color: rgba(135, 208, 104, 0.3);
+            :deep(.ant-statistic-content-value) {
+              color: #87d068 !important;
+            }
+          }
+
+          &:nth-child(4) {
+            border-color: rgba(114, 46, 209, 0.3);
+            :deep(.ant-statistic-content-value) {
+              color: #722ed1 !important;
+            }
+          }
+        }
+      }
+    }
+
+    .info-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .description-area {
+        flex: 1;
+
+        .description-title {
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.65);
+          font-weight: 500;
+          margin-bottom: 8px;
+        }
+
+        .description-text {
+          color: rgba(255, 255, 255, 0.85);
+          font-size: 14px;
+          line-height: 1.5;
+          margin: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          max-height: 63px;
+        }
+      }
+
+      .latest-datasets-area {
+        .latest-datasets-title {
+          display: flex;
+          align-items: center;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.65);
+          font-weight: 500;
+          margin-bottom: 8px;
+
+          .section-icon {
+            margin-right: 4px;
+            color: #1890ff;
+          }
+        }
+
+        .latest-datasets-content {
+          .dataset-item-horizontal {
+            margin-bottom: 8px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .dataset-link {
+              display: block;
+
+              &:hover {
+                color: #1890ff;
+              }
+
+              .dataset-info-horizontal {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 12px;
+                background: transparent;
+                border-radius: 6px;
+                border: 1px solid rgba(24, 144, 255, 0.15);
+                transition: all 0.3s;
+
+                &:hover {
+                  border-color: rgba(24, 144, 255, 0.4);
+                  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+                }
+
+                .dataset-name {
+                  flex: 1;
+                  font-size: 14px;
+                  color: inherit;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                  margin-right: 8px;
+                }
+
+                .dataset-date {
+                  font-size: 12px;
+                  color: rgba(255, 255, 255, 0.45);
+                  white-space: nowrap;
+                }
+              }
+            }
+          }
+
+          .empty-datasets {
+            :deep(.ant-empty-description) {
+              font-size: 12px;
+              color: rgba(255, 255, 255, 0.45);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// 响应式调整
+@media (max-width: 768px) {
+  .dataset-group-card-horizontal {
+    height: auto;
+
+    .card-content-horizontal {
+      flex-direction: column;
+      gap: 16px;
+
+      .stats-section {
+        flex: none;
+
+        .stats-row {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    }
+  }
+}
+
+.dataset-group-container {
+  .card-list-wrapper {
+    padding: 16px;
+  }
+
+  .dataset-group-card {
+    transition: all 0.3s;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-4px);
+    }
+
+    .card-title-flex {
+      display: flex;
+      align-items: center;
+    }
+
+    .card-description {
+      height: 44px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .card-content {
+      .dataset-count {
+        font-size: 14px;
+      }
+      .latest-datasets-title {
+        font-size: 13px;
+        color: #737373;
+        margin-bottom: 4px;
+      }
+
+      .latest-datasets-list {
+        // 固定高度，按照2个数据集项的高度计算
+        // 每个dataset-item高度约28px，2个就是56px，加上间距约60px
+        min-height: 60px;
+        height: 60px;
+        overflow: hidden;
+
+        .dataset-item {
+          margin-bottom: 6px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .dataset-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+
+            .dataset-name-link {
+              flex: 1;
+              display: flex;
+              align-items: center;
+              min-width: 0; // 允许文本截断
+
+              .anticon {
+                margin-right: 4px;
+                flex-shrink: 0;
+              }
+
+              .dataset-name {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                flex: 1;
+              }
+
+              &:hover {
+                color: #1890ff;
+              }
+            }
+
+            .dataset-date {
+              font-size: 11px;
+              color: #999;
+              margin-left: 8px;
+              white-space: nowrap;
+              flex-shrink: 0;
+            }
+          }
+        }
+        // 空状态的样式调整，使其居中显示
+        :deep(.ant-empty) {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+          margin: 0;
+
+          .ant-empty-image {
+            margin-bottom: 4px;
+          }
+
+          .ant-empty-description {
+            font-size: 12px;
+            color: #999;
+          }
+        }
+      }
+    }
+
+    .card-footer {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #aaa;
+      text-align: right;
+    }
+
+    :deep(.ant-card-body) {
+      padding: 16px;
+    }
+    :deep(.ant-list-item) {
+      padding: 4px 0;
+    }
+  }
+}
+
+.version-table-wrapper {
+  // padding: 12px;
+}
+
+// 高亮相关样式
+:deep(.manual-highlight) {
+  animation: soft-glow 4s ease-in-out !important;
+}
+
+@keyframes soft-glow {
+  0% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+  5% {
+    background-color: rgba(24, 144, 255, 0.03);
+    box-shadow: 0 0 2px rgba(24, 144, 255, 0.1);
+  }
+  10% {
+    background-color: rgba(24, 144, 255, 0.08);
+    box-shadow: 0 0 4px rgba(24, 144, 255, 0.15);
+  }
+  20% {
+    background-color: rgba(24, 144, 255, 0.15);
+    box-shadow: 0 0 8px rgba(24, 144, 255, 0.2);
+  }
+  30% {
+    background-color: rgba(24, 144, 255, 0.14);
+    box-shadow: 0 0 7px rgba(24, 144, 255, 0.18);
+  }
+  50% {
+    background-color: rgba(24, 144, 255, 0.12);
+    box-shadow: 0 0 6px rgba(24, 144, 255, 0.15);
+  }
+  65% {
+    background-color: rgba(24, 144, 255, 0.1);
+    box-shadow: 0 0 5px rgba(24, 144, 255, 0.12);
+  }
+  80% {
+    background-color: rgba(24, 144, 255, 0.06);
+    box-shadow: 0 0 3px rgba(24, 144, 255, 0.08);
+  }
+  90% {
+    background-color: rgba(24, 144, 255, 0.03);
+    box-shadow: 0 0 2px rgba(24, 144, 255, 0.05);
+  }
+  95% {
+    background-color: rgba(24, 144, 255, 0.01);
+    box-shadow: 0 0 1px rgba(24, 144, 255, 0.02);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+// 高亮行样式
+:deep(.highlighted-row) {
+  background-color: rgba(24, 144, 255, 0.08) !important;
+  transition: background-color 0.3s ease;
+}
+
+.show-all-tags-trigger {
+  color: #1890ff;
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: none;
+  margin-left: 4px;
+
+  &:hover {
+    color: #40a9ff;
+    text-decoration: underline;
+  }
+}

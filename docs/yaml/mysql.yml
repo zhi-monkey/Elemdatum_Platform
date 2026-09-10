@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:mysql://10.8.176.79:31441/mineai_cz?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: user
+    password: Aa123456789.

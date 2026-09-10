@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: $K8S_NS_AI
+  name: gateway-deployment
+  labels:
+    app: gateway
+spec:
+  replicas: 1
+  strategy: # 滚动更新策略
+    type: Recreate  # Recreate表示的是单批次更新
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      # 使用宿主机网络
+      hostNetwork: true
+      # 该设置是使POD使用k8s的dns，dns配置在/etc/resolv.conf文件中
+      # 如果不加，pod默认使用所在宿主主机使用的DNS，这样会导致容器
+      # 内不能通过service name访问k8s集群中其他POD
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: gateway
+          image: $REGISTRY_URL/$PUB_REGISTRY_REPO/mineai-gateway:$TAG
+          ports:
+            - containerPort: 80
+              name: http-gateway
+          env:
+            - name: PARAMS
+              value: --nacos-env=$NACOS_NS_ID --spring.cloud.nacos.discovery.server-addr=$NACOS_ADDR --spring.cloud.nacos.config.server-addr=$NACOS_ADDR
+      affinity:
+        nodeAffinity:  # 作用域: Pod和Node之间
+          requiredDuringSchedulingIgnoredDuringExecution:  # Node亲和性-硬策略
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - m2
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: $K8S_NS_AI
+  name: mine-ai-gateway
+spec:
+  type: NodePort
+  selector:
+    app: gateway
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http-gateway
+      nodePort: 30010

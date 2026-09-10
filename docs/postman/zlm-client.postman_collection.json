@@ -1,0 +1,161 @@
+{
+  "info": {
+    "_postman_id": "f8f4e1e2-2f48-4f8b-8e66-d9f9f7c6a001",
+    "name": "MineAI ZLM Client",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "ZLM联调接口集合：连接测试、RTSP拉流、截图"
+  },
+  "item": [
+    {
+      "name": "1. Test Connection",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/zlm/testConnection",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "zlm",
+            "testConnection"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Response has code', function () {",
+              "  pm.expect(json).to.have.property('code');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Pull RTSP",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"rtspUrl\": \"{{rtspSourceUrl}}\",\n  \"stream\": \"{{streamName}}\",\n  \"app\": \"{{zlmApp}}\",\n  \"closeOld\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/zlm/pullRtsp",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "zlm",
+            "pullRtsp"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Business code exists', function () {",
+              "  pm.expect(json).to.have.property('code');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Snapshot",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "image/jpeg"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/zlm/snapshot?url={{snapStreamUrl}}&timeoutSec=10&expireSec=30",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "zlm",
+            "snapshot"
+          ],
+          "query": [
+            {
+              "key": "url",
+              "value": "{{snapStreamUrl}}"
+            },
+            {
+              "key": "timeoutSec",
+              "value": "10"
+            },
+            {
+              "key": "expireSec",
+              "value": "30"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "rtspSourceUrl",
+      "value": "rtsp://210.30.96.107:32204/live/test"
+    },
+    {
+      "key": "streamName",
+      "value": "stream_demo"
+    },
+    {
+      "key": "zlmApp",
+      "value": "monitor"
+    },
+    {
+      "key": "snapStreamUrl",
+      "value": "rtsp://210.30.96.107:32204/monitor/stream_demo"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+server:
+  port: 8866
+
+spring:
+  application:
+    name: dubhe-auth
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        enabled: true
+        server-addr: localhost:8848
+        namespace: data-element
+        shared-configs[0]:
+          data-id: common-biz.yaml
+          group: DEFAULT_GROUP
+          refresh: true  # 是否动态刷新，默认为false
+        shared-configs[1]:
+          data-id: dubhe-auth.yaml
+          group: DEFAULT_GROUP
+          refresh: true
+        shared-configs[2]:
+          data-id: inet.yml
+          group: DEFAULT_GROUP
+          refresh: true
+      discovery:
+        enabled: true
+        namespace: data-element
+        group: DEFAULT_GROUP
+        server-addr: localhost:8848
+

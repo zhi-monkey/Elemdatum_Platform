@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imgprocess
+  namespace: mineai-cz
+spec:
+  selector:
+    matchLabels:
+      app: imgprocess
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: imgprocess
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: imgprocess
+          image: dockerhub.kubekey.local/enlin/imgprocess:v2
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command: ["test","-e","/root/.startup"]
+          command: ["/bin/bash","-c","cd /dubhe_data_process && python3 main.py imgprocess False mineai-redis-master.mineai-cz,6379,10,'DUBHE_REDIS_PASSWORD'"]
+          volumeMounts:
+            - name: code-pvc
+              mountPath: /dubhe_data_process
+              subPath: dubhe_data_process
+          ports:
+            - containerPort: 9898
+              protocol: TCP
+      volumes:
+        - name: code-pvc
+          persistentVolumeClaim:
+            claimName: cz-dubhe-data-pvc

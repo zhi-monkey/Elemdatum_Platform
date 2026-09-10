@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: $K8S_NAMESPACE
+  name: zlm-deployment
+  labels:
+    app: zlm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zlm
+  template:
+    metadata:
+      labels:
+        app: zlm
+    spec:
+      containers:
+        - name: zlm
+          image: zlmediakit/zlmediakit:master
+          volumeMounts:
+            - name: volume-zlm
+              mountPath: /opt/media/conf
+            - name: file-data
+              mountPath: /opt/media/record
+          ports:
+            - containerPort: 10000
+              name: n10000
+              protocol: TCP
+            - containerPort: 1935
+              name: n1935
+              protocol: TCP
+            - containerPort: 443
+              name: n443
+              protocol: TCP
+            - containerPort: 554
+              name: n554
+              protocol: TCP
+            - containerPort: 80
+              name: n80
+              protocol: TCP
+            - containerPort: 31006
+              name: n31006
+              protocol: UDP
+            - containerPort: 9000
+              name: n9000
+              protocol: UDP
+      volumes:
+        - name: volume-zlm
+          configMap:
+            name: zlm
+        - name: file-data
+          hostPath:
+            path: /home/data
+            type: DirectoryOrCreate
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mine-ai-zlm
+  namespace: $K8S_NAMESPACE
+spec:
+  type: NodePort
+  selector:
+    app: zlm
+  ports:
+    - name: n10000
+      protocol: TCP
+      port: 10000
+      targetPort: n10000
+      nodePort: 31000
+    - name: n1935
+      protocol: TCP
+      port: 1935
+      targetPort: n1935
+      nodePort: 31002
+    - name: n443
+      protocol: TCP
+      port: 443
+      targetPort: n443
+      nodePort: 31003
+    - name: n554
+      protocol: TCP
+      port: 554
+      targetPort: n554
+      nodePort: 31004
+    - name: n80
+      protocol: TCP
+      port: 80
+      targetPort: n80
+      nodePort: 31005
+    - name: n31006
+      protocol: UDP
+      port: 31006
+      targetPort: n31006
+      nodePort: 31006
+    - name: n9000
+      protocol: UDP
+      port: 9000
+      targetPort: n9000
+      nodePort: 31007

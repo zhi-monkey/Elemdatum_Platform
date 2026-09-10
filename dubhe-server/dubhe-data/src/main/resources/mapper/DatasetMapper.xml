@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.dubhe.data.dao.DatasetMapper">
+    <select id="dataVersionListVO" resultType="org.dubhe.data.domain.vo.DatasetVersionQueryVO">
+        select id, `name` from data_dataset where deleted = 0 and current_version_name is not null
+        <if test="annotateType != null">
+            and annotate_type = #{annotateType}
+        </if>
+        <if test="module != null">
+            and module = #{module}
+        </if>
+        <if test="ids != null and ids.size > 0">
+            and id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        and (type = 2 or origin_user_id = #{currentUserId})
+    </select>
+
+    <!-- DatasetInfoVO ResultMap -->
+    <resultMap id="dataDatasetResultMap" type="org.dubhe.data.domain.vo.DatasetInfoVO">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="annotateType" column="annotate_type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="currentVersionName" column="current_version_name"/>
+        <result property="versionFileCount" column="version_file_count"/>
+    </resultMap>
+
+    <!-- 查询data_dataset表中current_version_name不为null的前10条记录，并计算对应的version_file_count -->
+    <select id="selectDatasetsWithVersionFileCount" resultMap="dataDatasetResultMap">
+        SELECT
+            d.id,
+            d.name,
+            d.annotate_type,
+            d.create_time,
+            d.current_version_name,
+            (
+                SELECT COUNT(*)
+                FROM data_dataset_version_file dvf
+                WHERE dvf.dataset_id = d.id
+                  AND dvf.version_name = d.current_version_name
+            ) AS version_file_count
+        FROM data_dataset d
+        WHERE d.current_version_name IS NOT NULL
+        LIMIT 10
+    </select>
+
+
+    <update id="batchRecoverDataset">
+        UPDATE data_dataset
+        SET deleted = false, update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="getDatasetNamesAndTimeList" resultType="org.dubhe.data.domain.dto.DatasetNameTimeDTO">
+        SELECT
+        name,
+        create_time
+        FROM
+        data_dataset
+        <where>
+            <if test="datasetIds != null and datasetIds.size() > 0">
+                id IN
+                <foreach collection="datasetIds" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,18 @@
+zlm:
+  address: http://210.30.96.106:8080/index/api
+  secret: 035c73f7-bb6b-4889-a715-d9eb2d1925cc
+  app: monitor
+  host: __defaultVhost__
+  record:
+    path: /opt/media/record/
+    second: 60
+  rtmp:
+    prefix: rtmp://210.30.96.106:1935
+  rtsp:
+    prefix: rtsp://210.30.96.106:8554
+  webrtc:
+    prefix: webrtc://210.30.96.106:8080
+  wsflv:
+    prefix: ws://210.30.96.106:8080 # 仅供外部接口
+  fmp4:
+    prefix: http://210.30.96.106:8080

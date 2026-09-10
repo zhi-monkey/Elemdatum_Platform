@@ -1,0 +1,42 @@
+server:
+  port: 8823
+  # rest API 版本号
+  rest-version: v1
+
+spring:
+  application:
+    name: dubhe-data
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        enabled: true
+        server-addr: localhost:8848
+        namespace: data-element
+        shared-configs[0]:
+          data-id: common-biz.yaml
+          group: DEFAULT_GROUP
+          refresh: true  # 是否动态刷新，默认为false
+        shared-configs[1]:
+          data-id: common-recycle.yaml
+          group: DEFAULT_GROUP
+          refresh: true
+        shared-configs[2]:
+          # 配置1
+          data-id: dubhe-data.yaml
+          group: DEFAULT_GROUP
+          refresh: true
+      discovery:
+        enabled: true
+        namespace: data-element
+        group: DEFAULT_GROUP
+        server-addr: localhost:8848
+  # 配置允许后面的Bean覆盖前面名称重复的Bean
+  main:
+    allow-bean-definition-overriding: true
+
+#mybatis-plus配置控制台打印完整带参数SQL语句
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

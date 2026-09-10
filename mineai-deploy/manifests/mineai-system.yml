@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: $K8S_NS_AI
+  name: system-deployment
+  labels:
+    app: system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: system
+  template:
+    metadata:
+      labels:
+        app: system
+    spec:
+      containers:
+        - name: system
+          image: $REGISTRY_URL/$PUB_REGISTRY_REPO/mineai-system:$TAG
+          env:
+            - name: PARAMS
+              value: --nacos-env=$NACOS_NS_ID --spring.cloud.nacos.discovery.server-addr=$NACOS_ADDR --spring.cloud.nacos.config.server-addr=$NACOS_ADDR

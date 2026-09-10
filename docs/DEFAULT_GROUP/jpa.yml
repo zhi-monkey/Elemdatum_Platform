@@ -1,0 +1,7 @@
+spring:
+  jpa:
+    #启用SQL语句的日志记录
+    show-sql: true
+    hibernate:
+      #设置ddl模式
+      ddl-auto: update

@@ -1,0 +1,22 @@
+# 不会在动态配置推送中覆盖的固定配置
+# 优先于application.yml加载
+nacos-env: data-element
+spring:
+  application:
+    name: mineai-gateway
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: ${nacos-env}
+      config:
+        server-addr: localhost:8848
+        file-extension: yml
+        namespace: ${nacos-env}
+
+        extension-configs[0]:
+          data-id: inet.yml # 服务注册所用IP配置
+          group: DEFAULT_GROUP
+          refresh: false
+

@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户手册</title>
+  <link rel="stylesheet" href="https://unpkg.com/vditor@3.10.3/dist/index.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    .vditor-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0;
+      background: #fff;
+      border-radius: 0;
+      box-shadow: none;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      min-height: 100vh;
+      min-width: 0;
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    .vditor-container {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100%;
+    }
+
+    .vditor-reset h1,
+    .vditor-reset h2,
+    .vditor-reset h3,
+    .vditor-reset h4,
+    .vditor-reset h5,
+    .vditor-reset h6 {
+      color: #333;
+    }
+
+    .vditor-ir__node[data-type='heading'] h1,
+    .vditor-ir__node[data-type='heading'] h2,
+    .vditor-ir__node[data-type='heading'] h3,
+    .vditor-ir__node[data-type='heading'] h4,
+    .vditor-ir__node[data-type='heading'] h5,
+    .vditor-ir__node[data-type='heading'] h6 {
+      color: #333;
+    }
+
+    .vditor {
+      border: none;
+      position: relative;
+      height: 100% !important;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .vditor .vditor-content {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      min-height: 0;
+      min-width: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .vditor .vditor-ir {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding-right: 0;
+      margin-right: 0;
+      margin-left: 450px;
+      min-height: 0;
+      width: calc(100% - 450px);
+      max-width: calc(100% - 450px);
+      min-width: calc(100% - 450px);
+      transition: margin-left 0.3s ease, width 0.3s ease, max-width 0.3s ease, min-width 0.3s ease;
+    }
+
+    .vditor .vditor-ir .vditor-ir__editor {
+      flex: 1;
+      overflow-y: auto !important;
+      overflow-x: hidden;
+      height: 100%;
+      padding-right: 20px;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 8px;
+      padding-left: 20px;
+      min-height: 0;
+      word-wrap: break-word;
+      word-break: break-word;
+      hyphens: auto;
+      caret-color: transparent !important;
+      cursor: default !important;
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      -moz-user-select: text !important;
+      -ms-user-select: text !important;
+      transition: max-width 0.3s ease, padding 0.3s ease;
+    }
+
+    .vditor .vditor-ir .vditor-ir__editor p,
+    .vditor .vditor-ir .vditor-ir__editor h1,
+    .vditor .vditor-ir .vditor-ir__editor h2,
+    .vditor .vditor-ir .vditor-ir__editor h3,
+    .vditor .vditor-ir .vditor-ir__editor h4,
+    .vditor .vditor-ir .vditor-ir__editor h5,
+    .vditor .vditor-ir .vditor-ir__editor h6,
+    .vditor .vditor-ir .vditor-ir__editor li,
+    .vditor .vditor-ir .vditor-ir__editor td,
+    .vditor .vditor-ir .vditor-ir__editor th {
+      max-width: 100%;
+      overflow-wrap: break-word;
+    }
+
+    .vditor .vditor-ir .vditor-ir__editor pre,
+    .vditor .vditor-ir .vditor-ir__editor code {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .vditor .vditor-ir .vditor-ir__editor::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .vditor .vditor-ir .vditor-ir__editor::-webkit-scrollbar-track {
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    .vditor .vditor-ir .vditor-ir__editor::-webkit-scrollbar-thumb {
+      background: #d9d9d9;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+
+    .vditor .vditor-ir .vditor-ir__editor::-webkit-scrollbar-thumb:hover {
+      background: #bfbfbf;
+    }
+
+    .vditor .vditor-ir h1,
+    .vditor .vditor-ir h2,
+    .vditor .vditor-ir h3,
+    .vditor .vditor-ir h4,
+    .vditor .vditor-ir h5,
+    .vditor .vditor-ir h6 {
+      color: #333;
+      font-weight: bold;
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+      line-height: 1.4;
+    }
+
+    .vditor .vditor-ir h1 {
+      color: #1a1a1a;
+      border-bottom: 1px solid #e8e8e8;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      font-size: 2em;
+      margin-top: 0;
+    }
+
+    .vditor .vditor-ir h2 {
+      color: #262626;
+      border-left: 3px solid #1890ff;
+      padding-left: 12px;
+      margin: 24px 0 12px 0;
+      font-size: 1.5em;
+    }
+
+    .vditor .vditor-ir h3 {
+      color: #434343;
+      margin: 20px 0 10px 0;
+      font-size: 1.17em;
+    }
+
+    .vditor .vditor-ir h4 {
+      color: #595959;
+      margin: 16px 0 8px 0;
+      font-size: 1em;
+    }
+
+    .vditor .vditor-ir h5 {
+      color: #8c8c8c;
+      margin: 12px 0 6px 0;
+      font-size: 0.83em;
+    }
+
+    .vditor .vditor-ir h6 {
+      color: #bfbfbf;
+      margin: 8px 0 4px 0;
+      font-size: 0.67em;
+    }
+
+    .vditor .vditor-ir p {
+      margin: 0.5em 0;
+      line-height: 1.6;
+    }
+
+    .vditor .vditor-ir ul,
+    .vditor .vditor-ir ol {
+      margin: 0.5em 0;
+      padding-left: 1.5em;
+    }
+
+    .vditor .vditor-ir ul li,
+    .vditor .vditor-ir ol li {
+      margin: 0.3em 0;
+    }
+
+    .vditor .vditor-outline {
+      max-height: 100%;
+      height: 100%;
+      left: 0;
+      margin-right: 0;
+      z-index: 100;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      background-color: white;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+      border-radius: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      width: 450px;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .vditor .vditor-outline::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .vditor .vditor-outline::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 3px;
+    }
+
+    .vditor .vditor-outline::-webkit-scrollbar-thumb {
+      background: #d9d9d9;
+      border-radius: 3px;
+      transition: background 0.3s;
+    }
+
+    .vditor .vditor-outline::-webkit-scrollbar-thumb:hover {
+      background: #bfbfbf;
+    }
+
+    .vditor .vditor-outline__content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      max-height: calc(100% - 50px) !important;
+      margin-right: 2px;
+      padding-right: 8px;
+      padding-left: 8px;
+      margin: 0;
+      padding: 0;
+      min-height: 0;
+    }
+
+    .vditor .vditor-outline__content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .vditor .vditor-outline__content::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 3px;
+    }
+
+    .vditor .vditor-outline__content::-webkit-scrollbar-thumb {
+      background: #d9d9d9;
+      border-radius: 3px;
+      transition: background 0.3s;
+    }
+
+    .vditor .vditor-outline__content::-webkit-scrollbar-thumb:hover {
+      background: #bfbfbf;
+    }
+
+    .vditor .vditor-outline__content a {
+      display: block;
+      padding: 6px 0 6px 12px;
+      color: #666;
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      line-height: 1.4;
+      border-radius: 4px;
+      margin: 2px 0;
+      word-break: break-word;
+      white-space: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .vditor .vditor-outline__content a:hover {
+      color: #1890ff;
+      border-left-color: #1890ff;
+      background-color: rgba(24, 144, 255, 0.05);
+    }
+
+    .vditor .vditor-outline__content a[data-level='1'] {
+      font-weight: 600;
+      padding-left: 12px;
+      font-size: 15px;
+      margin-top: 8px;
+    }
+
+    .vditor .vditor-outline__content a[data-level='2'] {
+      padding-left: 20px;
+      font-size: 14px;
+    }
+
+    .vditor .vditor-outline__content a[data-level='3'] {
+      padding-left: 28px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .vditor .vditor-outline__content a[data-level='4'] {
+      padding-left: 36px;
+      font-size: 12px;
+      color: #888;
+    }
+
+    .vditor [contenteditable='true'] {
+      pointer-events: none !important;
+    }
+
+    .vditor-ir__editor {
+      scrollbar-width: thin;
+      scrollbar-color: #d9d9d9 #f5f5f5;
+    }
+
+    .outline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #1890ff;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 1;
+      padding-right: 6px;
+    }
+
+    .outline-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .outline-lock-btn-inner {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #999;
+      transition: all 0.3s ease;
+      background: transparent;
+      border: 1px solid #e8e8e8;
+      flex-shrink: 0;
+    }
+
+    .outline-lock-btn-inner:hover {
+      background: #f5f5f5;
+      color: #666;
+    }
+
+    .outline-tooltip {
+      position: fixed;
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      line-height: 1.4;
+      max-width: 200px;
+      z-index: 1000;
+      display: none;
+      pointer-events: none;
+      word-wrap: break-word;
+      white-space: normal;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      border: 1px solid #333;
+    }
+
+    .vditor-ir h1:not(:first-child) {
+      margin-top: 1.5em !important;
+    }
+
+    .vditor-ir h2:not(:first-child) {
+      margin-top: 1.2em !important;
+    }
+
+    .vditor-ir h3:not(:first-child) {
+      margin-top: 1em !important;
+    }
+
+    /* 隐藏所有标题标记 */
+    [data-type='heading-marker'] {
+      display: none !important;
+    }
+
+    .vditor-ir__marker--heading {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      position: absolute !important;
+    }
+
+    .vditor-ir__node[data-type='heading']::before,
+    .vditor-ir__node[data-marker='#']::before,
+    .vditor-ir h1::before,
+    .vditor-ir h2::before,
+    .vditor-ir h3::before,
+    .vditor-ir h4::before,
+    .vditor-ir h5::before,
+    .vditor-ir h6::before {
+      content: none !important;
+      display: none !important;
+    }
+
+    /* 隐藏图片标记和预览信息 */
+    .vditor-ir__node[data-type='img'] .vditor-ir__marker,
+    .vditor-ir__img-preview ~ span,
+    img::before,
+    img::after {
+      display: none !important;
+    }
+
+    /* 隐藏HTML块代码 */
+    .vditor-ir__node[data-type='html-block'] code[data-type='html-block'] {
+      display: none !important;
+    }
+
+    /* 图片预览相关样式 */
+    .vditor-ir img {
+      cursor: zoom-in;
+      transition: transform 0.2s ease;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .vditor-ir img:hover {
+      opacity: 0.9;
+    }
+
+    .img-fullscreen-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 99999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: zoom-out;
+      animation: overlayFadeIn 0.3s ease;
+    }
+
+    .img-fullscreen-overlay img {
+      animation: imageScaleIn 0.3s ease;
+    }
+
+    @keyframes overlayFadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes imageScaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes tooltip-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(-2px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="vditor-wrapper" id="vditor-wrapper">
+  <div class="vditor-container">
+    <div id="vditor"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/vditor@3.10.3/dist/index.min.js"></script>
+<script>
+  (function() {
+    "use strict";
+
+    const wrapperRef = document.getElementById("vditor-wrapper");
+    const vditorRef = document.getElementById("vditor");
+    let vditorInstance = null;
+    let outlineElement = null;
+    let isOutlineLocked = true;
+    let hideTimer = null;
+    let showTimer = null;
+    let isScrolling = false;
+    let scrollTimeout = null;
+    let editorElement = null;
+    let editorContentElement = null;
+    let isMouseOverOutline = false;
+    let resizeObserver = null;
+    let tooltipElement = null;
+    let isTooltipVisible = false;
+    let tooltipHideTimer = null;
+    let outlineMutationObserver = null;
+    let outlineContentObserver = null;
+    let isEditorWidthLocked = false;
+    let originalEditorWidth = 0;
+    let resizeTimer = null;
+
+    const getDynamicHeight = () => {
+      if (!wrapperRef) return window.innerHeight;
+      const wrapperRect = wrapperRef.getBoundingClientRect();
+      return window.innerHeight - wrapperRect.top;
+    };
+
+    const updateVditorHeight = () => {
+      if (vditorInstance && vditorRef) {
+        const newHeight = getDynamicHeight();
+
+        // 设置wrapper高度
+        if (wrapperRef) {
+          wrapperRef.style.height = `${newHeight}px`;
+          wrapperRef.style.minHeight = `${newHeight}px`;
+        }
+
+        // 设置vditor容器高度
+        vditorRef.style.height = `${newHeight}px`;
+        vditorRef.style.minHeight = `${newHeight}px`;
+
+        // 尝试通过Vditor实例设置高度
+        if (vditorInstance.vditor && vditorInstance.vditor.element) {
+          const vditorElem = vditorInstance.vditor.element;
+          vditorElem.style.height = `${newHeight}px`;
+          vditorElem.style.minHeight = `${newHeight}px`;
+        }
+
+        // 延迟触发内部重绘
+        setTimeout(() => {
+          if (vditorInstance.vditor && vditorInstance.vditor.resize) {
+            vditorInstance.vditor.resize();
+          }
+        }, 50);
+      }
+    };
+
+    // 图片预览函数
+    function showImagePreview(img) {
+      const overlay = document.createElement("div");
+      overlay.className = "img-fullscreen-overlay";
+      overlay.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.9);
+          z-index: 99999;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: zoom-out;
+        `;
+
+      const container = document.createElement("div");
+      container.style.cssText = `
+          max-width: 90vw;
+          max-height: 90vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+        `;
+
+      const previewImg = document.createElement("img");
+      previewImg.src = img.src;
+      previewImg.alt = img.alt;
+
+      const naturalWidth = img.naturalWidth || img.width;
+      const naturalHeight = img.naturalHeight || img.height;
+
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const maxWidth = viewportWidth * 0.9;
+      const maxHeight = viewportHeight * 0.9;
+
+      const widthRatio = maxWidth / naturalWidth;
+      const heightRatio = maxHeight / naturalHeight;
+      const scale = Math.min(widthRatio, heightRatio, 1);
+
+      previewImg.style.maxWidth = `${maxWidth}px`;
+      previewImg.style.maxHeight = `${maxHeight}px`;
+      previewImg.style.width = `${naturalWidth * scale}px`;
+      previewImg.style.height = `${naturalHeight * scale}px`;
+      previewImg.style.objectFit = "contain";
+      previewImg.style.borderRadius = "8px";
+      previewImg.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.5)";
+      previewImg.style.background = "white";
+      previewImg.style.padding = "4px";
+      previewImg.style.cursor = "default";
+
+      const closePreview = () => {
+        if (overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
+        }
+        document.removeEventListener("keydown", handleKeyDown);
+        document.body.style.overflow = "";
+      };
+
+      overlay.addEventListener("click", closePreview);
+
+      const handleKeyDown = (e) => {
+        if (e.key === "Escape" || e.key === " ") {
+          closePreview();
+        }
+      };
+
+      document.addEventListener("keydown", handleKeyDown);
+
+      previewImg.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      container.appendChild(previewImg);
+      overlay.appendChild(container);
+      document.body.appendChild(overlay);
+      document.body.style.overflow = "hidden";
+    }
+
+    function setupImagePreview() {
+      document.addEventListener("click", (e) => {
+        if (e.target.tagName === "IMG" && e.target.closest(".vditor-ir")) {
+          e.preventDefault();
+          e.stopPropagation();
+          showImagePreview(e.target);
+        }
+      }, true);
+    }
+
+    function disableEditorInput() {
+      if (!vditorInstance || !vditorRef) return;
+
+      const makeEditorReadonly = () => {
+        const editableElements = vditorRef.querySelectorAll("[contenteditable=\"true\"]") || [];
+
+        editableElements.forEach((element) => {
+          element.setAttribute("contenteditable", "false");
+          element.removeAttribute("contenteditable");
+        });
+      };
+
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "attributes" && mutation.attributeName === "contenteditable") {
+            if (mutation.target.getAttribute("contenteditable") === "true") {
+              mutation.target.setAttribute("contenteditable", "false");
+            }
+          } else if (mutation.type === "childList") {
+            mutation.addedNodes.forEach((node) => {
+              if (node.nodeType === 1) {
+                if (node.getAttribute("contenteditable") === "true") {
+                  node.setAttribute("contenteditable", "false");
+                }
+                const editables = node.querySelectorAll("[contenteditable=\"true\"]");
+                editables.forEach((el) => {
+                  el.setAttribute("contenteditable", "false");
+                });
+              }
+            });
+          }
+        });
+      });
+
+      if (vditorRef) {
+        observer.observe(vditorRef, {
+          attributes: true,
+          attributeFilter: ["contenteditable"],
+          childList: true,
+          subtree: true
+        });
+      }
+
+      makeEditorReadonly();
+
+      document.addEventListener("paste", (e) => {
+        if (e.target && vditorRef.contains(e.target)) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }, true);
+
+      document.addEventListener("drop", (e) => {
+        if (e.target && vditorRef.contains(e.target)) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }, true);
+
+      const style = document.createElement("style");
+      style.textContent = `
+          .vditor-ir__editor[contenteditable="true"] {
+            caret-color: transparent !important;
+          }
+          [contenteditable="true"] {
+            pointer-events: none !important;
+          }
+          .vditor-ir {
+            pointer-events: auto !important;
+          }
+          .vditor-ir__editor {
+            cursor: default !important;
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+          }
+        `;
+      document.head.appendChild(style);
+
+      const checkInterval = setInterval(() => {
+        makeEditorReadonly();
+      }, 1000);
+
+      window.addEventListener("beforeunload", () => {
+        observer.disconnect();
+        clearInterval(checkInterval);
+      });
+    }
+
+    function initOutlineBehavior() {
+      const container = document.querySelector(".vditor-container");
+      outlineElement = vditorRef.querySelector(".vditor-outline");
+      editorElement = vditorRef.querySelector(".vditor-ir");
+      editorContentElement = vditorRef.querySelector(".vditor-ir__node");
+
+      if (!outlineElement || !container || !editorElement) return;
+
+      setupOutlineStyles();
+      setupEditorHover();
+      setupOutlineHover();
+      setupScrollListener();
+      setupClickOutside(container);
+      setupOutlineTooltips();
+    }
+
+    function createTooltipElement() {
+      tooltipElement = document.createElement("div");
+      tooltipElement.className = "outline-tooltip";
+      tooltipElement.style.cssText = `
+          position: fixed;
+          background: rgba(255, 255, 255, 0.95);
+          color: #333;
+          padding: 6px 10px;
+          border-radius: 4px;
+          font-size: 12px;
+          line-height: 1.4;
+          max-width: 200px;
+          z-index: 1000;
+          display: none;
+          pointer-events: none;
+          word-wrap: break-word;
+          white-space: normal;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          opacity: 0;
+          transition: opacity 0.2s ease;
+          border: 1px solid #333;
+        `;
+      document.body.appendChild(tooltipElement);
+    }
+
+    function setupOutlineTooltips() {
+      if (!outlineElement) return;
+
+      createTooltipElement();
+      bindOutlineItemEvents();
+
+      outlineContentObserver = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.type === "childList") {
+            setTimeout(() => {
+              bindOutlineItemEvents();
+            }, 100);
+            break;
+          }
+        }
+      });
+
+      const outlineContent = outlineElement.querySelector(".vditor-outline__content");
+      if (outlineContent) {
+        outlineContentObserver.observe(outlineContent, {
+          childList: true,
+          subtree: true
+        });
+      }
+
+      outlineMutationObserver = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.attributeName === "style") {
+            const isVisible = outlineElement.style.opacity === "1" && outlineElement.style.pointerEvents === "auto";
+            if (!isVisible && tooltipElement) {
+              hideTooltip();
+            }
+            break;
+          }
+        }
+      });
+
+      outlineMutationObserver.observe(outlineElement, {
+        attributes: true,
+        attributeFilter: ["style"]
+      });
+    }
+
+    function bindOutlineItemEvents() {
+      if (!outlineElement) return;
+
+      const outlineContent = outlineElement.querySelector(".vditor-outline__content");
+      if (!outlineContent) return;
+
+      const items = outlineContent.querySelectorAll("span[data-target-id]");
+
+      items.forEach((item) => {
+        item.removeEventListener("mouseenter", handleOutlineItemMouseEnter);
+        item.removeEventListener("mouseleave", handleOutlineItemMouseLeave);
+        item.removeEventListener("mousemove", handleOutlineItemMouseMove);
+
+        item.addEventListener("mouseenter", handleOutlineItemMouseEnter);
+        item.addEventListener("mouseleave", handleOutlineItemMouseLeave);
+        item.addEventListener("mousemove", handleOutlineItemMouseMove);
+      });
+    }
+
+    function handleOutlineItemMouseEnter(e) {
+      if (!isOutlineVisible()) return;
+
+      const target = e.target;
+      const text = target.textContent || "";
+
+      if (text.trim() && tooltipElement) {
+        clearTooltipTimer();
+        showTooltip(target, text);
+      }
+    }
+
+    function handleOutlineItemMouseMove(e) {
+      if (!isOutlineVisible() || !isTooltipVisible || !tooltipElement) return;
+
+      const target = e.target;
+      const text = target.textContent || "";
+
+      if (text.trim()) {
+        updateTooltipPosition(target, e);
+      }
+    }
+
+    function handleOutlineItemMouseLeave(e) {
+      clearTooltipTimer();
+      tooltipHideTimer = setTimeout(() => {
+        hideTooltip();
+      }, 300);
+    }
+
+    function isOutlineVisible() {
+      if (!outlineElement) return false;
+
+      const style = outlineElement.style;
+      return style.opacity === "1" && style.pointerEvents === "auto";
+    }
+
+    function showTooltip(targetElement, text) {
+      if (!tooltipElement) return;
+
+      tooltipElement.textContent = text;
+      updateTooltipPosition(targetElement);
+      tooltipElement.style.display = "block";
+
+      requestAnimationFrame(() => {
+        tooltipElement.style.opacity = "1";
+      });
+
+      isTooltipVisible = true;
+    }
+
+    function updateTooltipPosition(targetElement, mouseEvent) {
+      if (!tooltipElement || !outlineElement) return;
+
+      const targetRect = targetElement.getBoundingClientRect();
+      let left = targetRect.right + 10;
+      let top = targetRect.top + 30;
+
+      if (top < 8) {
+        top = 8;
+      } else if (top + tooltipElement.offsetHeight > window.innerHeight - 8) {
+        top = window.innerHeight - tooltipElement.offsetHeight - 8;
+      }
+
+      tooltipElement.style.left = `${left}px`;
+      tooltipElement.style.top = `${top}px`;
+    }
+
+    function hideTooltip() {
+      if (!tooltipElement || !isTooltipVisible) return;
+
+      tooltipElement.style.opacity = "0";
+
+      setTimeout(() => {
+        if (tooltipElement) {
+          tooltipElement.style.display = "none";
+        }
+        isTooltipVisible = false;
+      }, 200);
+    }
+
+    function clearTooltipTimer() {
+      if (tooltipHideTimer) {
+        clearTimeout(tooltipHideTimer);
+        tooltipHideTimer = null;
+      }
+    }
+
+    function setupOutlineStyles() {
+      if (!outlineElement) return;
+
+      const outline = outlineElement;
+
+      outline.style.opacity = "1";
+      outline.style.transform = "translateX(0)";
+      outline.style.pointerEvents = "auto";
+      outline.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+      outline.style.position = "absolute";
+      outline.style.left = "0";
+      outline.style.top = "0";
+      outline.style.height = "100%";
+      outline.style.zIndex = "100";
+      outline.style.backgroundColor = "white";
+      outline.style.boxShadow = "2px 0 12px rgba(0, 0, 0, 0.1)";
+      outline.style.borderRadius = "0";
+      outline.style.overflowY = "auto";
+      outline.style.overflowX = "hidden";
+      outline.style.width = "450px";
+      outline.style.padding = "16px";
+      outline.style.boxSizing = "border-box";
+      outline.style.maxHeight = "100%";
+
+      const lockBtnContainer = document.createElement("div");
+      lockBtnContainer.className = "outline-header";
+      lockBtnContainer.style.cssText = `
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+          padding-bottom: 8px;
+          border-bottom: 2px solid #1890ff;
+          position: sticky;
+          top: 0;
+          background: white;
+          z-index: 1;
+          padding-right: 6px;
+        `;
+
+      const outlineTitle = document.createElement("div");
+      outlineTitle.className = "outline-title";
+      outlineTitle.textContent = "大纲";
+      outlineTitle.style.cssText = `
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+        `;
+
+      const lockBtn = document.createElement("div");
+      lockBtn.className = "outline-lock-btn-inner";
+      lockBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path
+              fill="currentColor"
+              d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
+            />
+          </svg>
+        `;
+      lockBtn.style.cssText = `
+          width: 24px;
+          height: 24px;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: #999;
+          transition: all 0.3s ease;
+          background: transparent;
+          border: 1px solid #e8e8e8;
+          flex-shrink: 0;
+        `;
+
+      lockBtn.addEventListener("mouseenter", () => {
+        lockBtn.style.background = "#f5f5f5";
+        lockBtn.style.color = "#666";
+      });
+
+      lockBtn.addEventListener("mouseleave", () => {
+        if (!isOutlineLocked) {
+          lockBtn.style.background = "transparent";
+          lockBtn.style.color = "#999";
+        }
+      });
+
+      lockBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleOutlineLock();
+      });
+
+      lockBtnContainer.appendChild(outlineTitle);
+      lockBtnContainer.appendChild(lockBtn);
+
+      const oldTitle = outline.querySelector(".vditor-outline__title");
+      if (oldTitle) {
+        outline.insertBefore(lockBtnContainer, oldTitle);
+        oldTitle.remove();
+      } else {
+        outline.insertBefore(lockBtnContainer, outline.firstChild);
+      }
+
+      updateLockBtnStyle(lockBtn);
+    }
+
+    function setupEditorHover() {
+      if (!editorElement) return;
+
+      // 监听整个文档的鼠标移动，而不仅仅是编辑器
+      document.addEventListener("mousemove", handleMouseMove);
+    }
+
+    function setupOutlineHover() {
+      if (!outlineElement) return;
+
+      outlineElement.addEventListener("mouseenter", () => {
+        isMouseOverOutline = true;
+        if (hideTimer) {
+          clearTimeout(hideTimer);
+          hideTimer = null;
+        }
+      });
+
+      outlineElement.addEventListener("mouseleave", (e) => {
+        isMouseOverOutline = false;
+        const relatedTarget = e.relatedTarget;
+        if (relatedTarget && !outlineElement.contains(relatedTarget)) {
+          if (!isOutlineLocked) {
+            scheduleHideOutline();
+          }
+        }
+      });
+    }
+
+    function handleMouseMove(e) {
+      if (isOutlineLocked || !editorElement) return;
+
+      // 直接使用clientX判断鼠标是否在左侧450px区域内
+      const x = e.clientX;
+
+      if (x >= 0 && x < 450) {
+        if (showTimer) clearTimeout(showTimer);
+        showTimer = setTimeout(() => {
+          showOutline();
+        }, 150);
+      } else {
+        if (showTimer) clearTimeout(showTimer);
+        if (!isScrolling && !isMouseOverOutline) {
+          scheduleHideOutline();
+        }
+      }
+    }
+
+    function setupScrollListener() {
+      if (!editorElement) return;
+
+      editorElement.addEventListener("scroll", () => {
+        isScrolling = true;
+
+        if (!isOutlineLocked) {
+          showOutline();
+        }
+
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          isScrolling = false;
+          if (!isOutlineLocked && !isMouseOverOutline) {
+            scheduleHideOutline();
+          }
+        }, 500);
+      });
+    }
+
+    function setupClickOutside(container) {
+      document.addEventListener("click", (e) => {
+        if (!outlineElement || isOutlineLocked) return;
+
+        const target = e.target;
+        const isClickInsideOutline = outlineElement.contains(target);
+        const isClickOnLockBtn = target.closest(".outline-lock-btn-inner");
+
+        if (!isClickInsideOutline && !isClickOnLockBtn) {
+          hideOutline();
+        }
+      });
+    }
+
+    function setupScrollbars() {
+      const editorContainer = vditorRef.querySelector(".vditor-ir");
+      if (editorContainer) {
+        editorContainer.style.marginRight = "0";
+        editorContainer.style.marginLeft = "450px";
+        editorContainer.style.paddingRight = "20px";
+        editorContainer.style.boxSizing = "border-box";
+
+        const irEditor = editorContainer.querySelector(".vditor-ir__editor");
+        if (irEditor) {
+          irEditor.style.height = "100%";
+          irEditor.style.overflowY = "auto";
+          irEditor.style.overflowX = "hidden";
+          irEditor.style.paddingRight = "0";
+        }
+      }
+
+      if (outlineElement) {
+        const outlineContent = outlineElement.querySelector(".vditor-outline__content");
+        if (outlineContent) {
+          outlineContent.style.maxHeight = "calc(100% - 50px)";
+          outlineContent.style.overflowY = "auto";
+          outlineContent.style.overflowX = "hidden";
+          outlineContent.style.paddingRight = "8px";
+        }
+
+        outlineElement.style.width = "450px";
+        outlineElement.style.left = "0";
+      }
+
+      const vditorContent = vditorRef.querySelector(".vditor-content");
+      if (vditorContent) {
+        vditorContent.style.overflow = "hidden";
+      }
+    }
+
+    function showOutline() {
+      if (!outlineElement) return;
+      
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+
+      outlineElement.style.opacity = "1";
+      outlineElement.style.transform = "translateX(0)";
+      outlineElement.style.pointerEvents = "auto";
+      
+      // 调整编辑器位置到右侧
+      if (editorElement) {
+        editorElement.style.setProperty('margin-left', '450px', 'important');
+        editorElement.style.setProperty('width', 'calc(100% - 450px)', 'important');
+        editorElement.style.setProperty('max-width', 'calc(100% - 450px)', 'important');
+        editorElement.style.setProperty('min-width', 'calc(100% - 450px)', 'important');
+        
+        // 调整编辑器内容区域
+        const irEditor = editorElement.querySelector(".vditor-ir__editor");
+        if (irEditor) {
+          irEditor.style.setProperty('max-width', '100%', 'important');
+          irEditor.style.setProperty('padding-left', '20px', 'important');
+          irEditor.style.setProperty('padding-right', '20px', 'important');
+          irEditor.style.setProperty('margin', '0', 'important');
+          irEditor.style.setProperty('width', '100%', 'important');
+        }
+      }
+    }
+
+    function hideOutline() {
+      if (!outlineElement || isOutlineLocked) return;
+
+      outlineElement.style.opacity = "0";
+      outlineElement.style.transform = "translateX(-450px)";
+      outlineElement.style.pointerEvents = "none";
+      hideTooltip();
+      
+      // 调整编辑器位置到居中
+      if (editorElement) {
+        editorElement.style.setProperty('margin-left', '0', 'important');
+        editorElement.style.setProperty('width', '100%', 'important');
+        editorElement.style.setProperty('max-width', '100%', 'important');
+        editorElement.style.setProperty('min-width', '100%', 'important');
+        
+        // 调整编辑器内容区域居中
+        const irEditor = editorElement.querySelector(".vditor-ir__editor");
+        if (irEditor) {
+          irEditor.style.setProperty('max-width', '1200px', 'important');
+          irEditor.style.setProperty('padding-left', '60px', 'important');
+          irEditor.style.setProperty('padding-right', '60px', 'important');
+          irEditor.style.setProperty('margin', '0 auto', 'important');
+          irEditor.style.setProperty('width', '100%', 'important');
+        }
+      }
+    }
+
+    function scheduleHideOutline() {
+      if (isOutlineLocked) return;
+
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        if (!isOutlineLocked && !isMouseOverOutline) {
+          hideOutline();
+        }
+      }, 200);
+    }
+
+    function toggleOutlineLock() {
+      isOutlineLocked = !isOutlineLocked;
+
+      const lockBtn = outlineElement.querySelector(".outline-lock-btn-inner");
+      if (lockBtn) {
+        updateLockBtnStyle(lockBtn);
+      }
+
+      if (isOutlineLocked) {
+        showOutline();
+      } else {
+        if (!isMouseOverOutline) {
+          scheduleHideOutline();
+        }
+      }
+    }
+
+    function updateLockBtnStyle(lockBtn) {
+      if (isOutlineLocked) {
+        lockBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="16" height="16">
+              <path
+                fill="currentColor"
+                d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M6,8V20A2,2 0 0,0 8,22H16A2,2 0 0,0 18,20V8H6M9,4V6H15V4A3,3 0 0,0 12,1A3,3 0 0,0 9,4Z"
+              />
+            </svg>
+          `;
+        lockBtn.style.background = "#e6f7ff";
+        lockBtn.style.color = "#1890ff";
+        lockBtn.style.borderColor = "#91d5ff";
+      } else {
+        lockBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="16" height="16">
+              <path
+                fill="currentColor"
+                d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"
+            />
+            </svg>
+          `;
+        lockBtn.style.background = "transparent";
+        lockBtn.style.color = "#999";
+        lockBtn.style.borderColor = "#e8e8e8";
+      }
+    }
+
+    function lockEditorContentWidth() {
+      if (!editorElement || !vditorInstance || isEditorWidthLocked) return;
+
+      const editorContent = editorElement.querySelector(".vditor-ir__editor");
+      if (!editorContent) return;
+
+      const container = editorElement.closest(".vditor-container");
+      if (!container) return;
+
+      const containerRect = container.getBoundingClientRect();
+      originalEditorWidth = containerRect.width;
+
+      editorContent.style.width = `${originalEditorWidth}px`;
+      editorContent.style.maxWidth = `${originalEditorWidth}px`;
+      editorContent.style.minWidth = `${originalEditorWidth}px`;
+      editorContent.style.boxSizing = "border-box";
+
+      isEditorWidthLocked = true;
+    }
+
+    function maintainEditorWidth(outlineHidden) {
+      if (!editorElement || !isEditorWidthLocked) return;
+
+      const editorContent = editorElement.querySelector(".vditor-ir__editor");
+      if (!editorContent) return;
+
+      if (editorContent.style.width !== `${originalEditorWidth}px`) {
+        editorContent.style.width = `${originalEditorWidth}px`;
+        editorContent.style.maxWidth = `${originalEditorWidth}px`;
+        editorContent.style.minWidth = `${originalEditorWidth}px`;
+      }
+    }
+
+    function setupResizeObserver() {
+      const wrapper = document.querySelector(".vditor-wrapper");
+      if (wrapper) {
+        resizeObserver = new ResizeObserver(() => {
+          if (resizeTimer) clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(() => {
+            updateVditorHeight();
+            // 不再锁定宽度，允许动态调整
+          }, 200);
+        });
+        resizeObserver.observe(wrapper);
+      }
+    }
+
+    // 初始化Vditor
+    async function initVditor() {
+      try {
+        const response = await fetch("/manual.md");
+        if (!response.ok) {
+          throw new Error(`Failed to fetch manual.md: ${response.status}`);
+        }
+        const markdown = await response.text();
+
+        vditorInstance = new Vditor(vditorRef, {
+          value: markdown,
+          height: getDynamicHeight(),
+          mode: "ir",
+          toolbar: [],
+          outline: {
+            enable: true,
+            position: "left"
+          },
+          cache: {
+            enable: false,
+            id: "vditor-manual-reader"
+          },
+          after: () => {
+            disableEditorInput();
+            initOutlineBehavior();
+            setupScrollbars();
+            setupResizeObserver();
+            // lockEditorContentWidth(); // 禁用宽度锁定，允许动态调整
+            setupImagePreview();
+
+            // 确保高度正确应用
+            setTimeout(() => {
+              updateVditorHeight();
+            }, 100);
+          }
+        });
+
+        // 防抖处理resize事件
+        let resizeDebounceTimer;
+        window.addEventListener("resize", () => {
+          clearTimeout(resizeDebounceTimer);
+          resizeDebounceTimer = setTimeout(updateVditorHeight, 200);
+        });
+      } catch (error) {
+        console.error("Error loading:", error);
+        vditorInstance = new Vditor(vditorRef, {
+          value: `# Error\nFailed to load manual.md file\n\nError: ${error}`,
+          height: getDynamicHeight(),
+          cache: {
+            enable: true,
+            id: "vditor-error"
+          },
+          after: () => {
+            setTimeout(() => {
+              updateVditorHeight();
+              disableEditorInput();
+              setupScrollbars();
+              setupResizeObserver();
+              // lockEditorContentWidth(); // 禁用宽度锁定，允许动态调整
+              setupImagePreview();
+            }, 100);
+          }
+        });
+      }
+    }
+
+    // 清理函数
+    function cleanup() {
+      if (hideTimer) clearTimeout(hideTimer);
+      if (showTimer) clearTimeout(showTimer);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      if (tooltipHideTimer) clearTimeout(tooltipHideTimer);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      if (outlineMutationObserver) {
+        outlineMutationObserver.disconnect();
+      }
+      if (outlineContentObserver) {
+        outlineContentObserver.disconnect();
+      }
+      if (tooltipElement && tooltipElement.parentNode) {
+        tooltipElement.parentNode.removeChild(tooltipElement);
+      }
+
+      window.removeEventListener("resize", updateVditorHeight);
+      document.removeEventListener("mousemove", handleMouseMove);
+      if (outlineElement) {
+        const items = outlineElement.querySelectorAll("span[data-target-id]");
+        items.forEach((item) => {
+          item.removeEventListener("mouseenter", handleOutlineItemMouseEnter);
+          item.removeEventListener("mouseleave", handleOutlineItemMouseLeave);
+          item.removeEventListener("mousemove", handleOutlineItemMouseMove);
+        });
+      }
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener("DOMContentLoaded", initVditor);
+
+    // 页面卸载时清理
+    window.addEventListener("beforeunload", cleanup);
+    window.addEventListener("unload", cleanup);
+  })();
+</script>
+</body>
+</html>

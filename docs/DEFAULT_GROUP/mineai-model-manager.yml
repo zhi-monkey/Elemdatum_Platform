@@ -1,0 +1,81 @@
+spring:
+    stream:
+      rocketmq:
+        bindings:
+          newUser-out-0:
+            producer:
+              group: dev
+
+      bindings:
+        newUser-out-0:
+          destination: SS-DA-newUser
+          group: dev
+
+datasetRootPath: C:/dataset
+
+modelImageRootPath: C:/modelImage
+
+chunkFolderPath: C:/chunk/
+
+kubernetes:
+    ip: 210.30.96.107
+    port: 6443
+    config: C:\dataset\k8s\config
+    nameSuffix: local-cz
+    namespace: ai-platform
+    pvc:    #创建job时使用的pvc，outputPVC是容器运行时输出的文件挂载的pvc，input是输入的文件（如训练用的数据集）挂载的pvc
+        outputPVC: file-data
+        inputPVC: dubhe-nfs-data
+    
+    rootPath:
+        weightRootPath: weight
+        datasetRootPath: cz-dev
+    nodeSelector: 
+        key: kubernetes.io/hostname
+        value: m1
+
+container: #容器内路径
+    weightPath: /weight
+    datasetPath: /dataset
+
+loki:
+    ip: 210.30.96.101
+    port: 30201
+
+docker-server:
+    ip: 210.30.96.107
+    port: 2376
+
+harbor-server:
+    url: dockerhub.kubekey.local
+    username: admin
+    password: Harbor12345
+    project: image_registry_of_user
+
+
+allowed_hyperParams:
+    MODEL_NAME|MODEL_VERSION|MODEL_DATA_TYPE|HP_EPOCHES|HP_BATCH_SIZE|HP_LEARNING_RATE|MODEL_TRAINING|MODEL_INSPECT|MODEL_INFERENCE|USE_GPU
+
+jobName_mineai: s2
+
+deployment:
+    ip: 210.30.96.101
+    port: 30010
+
+nodeNames:
+    m1|m2|m3
+    
+# minio配置
+minio:
+  url: http://210.30.96.101:9000/
+  accessKey: admin
+  secretKey: abcdefg123456
+  bucketName: cz-dev
+  presignedUrlExpiryTime: 300
+  annotation: /annotation/
+  
+zlm:
+  secret: 035c73f7-bb6b-4889-a715-d9eb2d1925cc
+  address: address
+  rtmp:
+    prefix: rtmp://210.30.96.106:1935

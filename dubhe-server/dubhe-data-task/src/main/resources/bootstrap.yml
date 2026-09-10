@@ -1,0 +1,35 @@
+server:
+  port: ${random.int[10000,19999]}
+
+spring:
+  application:
+    name: dubhe-data-task
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        enabled: true
+        namespace: data-element
+        server-addr: localhost:8848
+        shared-configs[0]:
+          data-id: common-biz.yaml
+          group: DEFAULT_GROUP
+          refresh: true  # 是否动态刷新，默认为false
+        shared-configs[1]:
+          data-id: common-recycle.yaml
+          group: DEFAULT_GROUP
+          refresh: true
+        shared-configs[2]:
+          # 配置1
+          data-id: dubhe-data-task.yaml
+          group: DEFAULT_GROUP
+          refresh: true
+      discovery:
+        enabled: true
+        namespace: data-element
+        group: DEFAULT_GROUP
+        server-addr: localhost:8848
+  # 配置允许后面的Bean覆盖前面名称重复的Bean
+  main:
+    allow-bean-definition-overriding: true

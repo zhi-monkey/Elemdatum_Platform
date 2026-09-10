@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recordimport
+  namespace: data-element
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recordimport
+  template:
+    metadata:
+      labels:
+        app: recordimport
+    spec:
+      containers:
+        - name: recordimport
+          image: dockerhub.kubekey.local/enlin/recordimport:v0.1.1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: WORKER_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: WORK_DIR
+              value: /work
+            - name: ASSET_BATCH_SIZE
+              value: "100"
+            - name: HEARTBEAT_SECONDS
+              value: "20"
+          envFrom:
+            - secretRef:
+                name: recordimport-config
+          volumeMounts:
+            - name: work
+              mountPath: /work
+          resources:
+            requests:
+              cpu: "2"
+              memory: 4Gi
+              ephemeral-storage: 16Gi
+            limits:
+              cpu: "4"
+              memory: 8Gi
+              ephemeral-storage: 20Gi
+      volumes:
+        - name: work
+          emptyDir:
+            sizeLimit: 16Gi
